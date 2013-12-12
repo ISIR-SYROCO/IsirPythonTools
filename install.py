@@ -4,9 +4,6 @@ from distutils.sysconfig import get_config_vars
 import os, sys, string, shutil, errno
 from site import USER_BASE
 
-isir_tools_package_dir =  os.getcwd()
-isir_tools_package_name = isir_tools_package_dir.split(os.sep)[-1]
-
 def force_symlink(file1, file2):
     try:
         os.symlink(file1, file2)
@@ -37,20 +34,21 @@ class develop(Command):
         if not os.path.isdir(out_dir):
             os.makedirs(out_dir)
 
-        out_dir = os.path.join(out_dir, isir_tools_package_name)
-        src_dir = os.path.join(isir_tools_package_dir, "src" )
-        if self.uninstall == 1:
-            if os.path.islink(out_dir):
-                print "Removing symlink "+out_dir
-                os.remove(out_dir)
+        for package_name in self.distribution.packages:
+            out_dir = os.path.join(out_dir, package_name)
+            src_dir = self.distribution.package_dir[package_name]
+            if self.uninstall == 1:
+                if os.path.islink(out_dir):
+                    print "Removing symlink "+out_dir
+                    os.remove(out_dir)
+                else:
+                    print "Not in dev mode, nothing to do"
             else:
-                print "Not in dev mode, nothing to do"
-        else:
-            if os.path.islink(out_dir):
-                print "Already in dev mode"
-            else:
-                print "Creating symlink "+src_dir+" -> "+out_dir
-                force_symlink(src_dir, out_dir)
+                if os.path.islink(out_dir):
+                    print "Already in dev mode"
+                else:
+                    print "Creating symlink "+src_dir+" -> "+out_dir
+                    force_symlink(src_dir, out_dir)
 
 cmdclass={'develop': develop}
 
