@@ -79,13 +79,13 @@ class develop(Command):
         self.prefix = os.path.expanduser(self.prefix)
 
     def run(self):
-        out_dir = os.path.join(self.prefix, "lib", "python"+self.py_version[0:3], "site-packages")
-        if not os.path.isdir(out_dir):
-            os.makedirs(out_dir)
-
         for package_name in self.distribution.packages:
+            out_dir = os.path.join(self.prefix, "lib", "python"+self.py_version[0:3], "site-packages")
+            if not os.path.isdir(out_dir):
+                os.makedirs(out_dir)
+
             out_dir = os.path.join(out_dir, package_name)
-            src_dir = self.distribution.package_dir[package_name]
+            src_dir = os.path.join(os.getcwd(),self.distribution.package_dir[package_name])
             if self.uninstall == 1:
                 if os.path.islink(out_dir):
                     print "Removing symlink "+out_dir
